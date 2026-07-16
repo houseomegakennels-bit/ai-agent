@@ -8,9 +8,7 @@ version = "0.1.0"
 description = "Telegram bot bridge for controlling Codex safely."
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = [
-    "python-telegram-bot>=21.0,<22.0",
-]
+dependencies = []
 
 [project.optional-dependencies]
 test = [

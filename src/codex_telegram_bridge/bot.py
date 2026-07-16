@@ -1,19 +1,13 @@
-"""Telegram command handlers for the Codex bridge."""
+"""Telegram Bot API polling bridge for Codex."""
 
 from __future__ import annotations
 
-import asyncio
+import json
+import time
 from html import escape
-
-from typing import Any, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from telegram import Update
-    from telegram.ext import Application, ContextTypes
-else:
-    Update = Any
-    ContextTypes = Any
-    Application = Any
+from typing import Any
+from urllib import parse, request
+from urllib.error import HTTPError, URLError
 
 from .codex_controller import CodexController, CommandResult, redact
 from .config import BridgeConfig, ConfigError, load_config
@@ -27,6 +21,43 @@ Commands:
 /run <instruction> - Run a controlled Codex task
 /run_confirm <instruction> - Run a task that passed your manual confirmation
 """
+
+
+class TelegramApiError(RuntimeError):
+    """Raised when Telegram Bot API calls fail."""
+
+
+class TelegramClient:
+    """Minimal stdlib Telegram Bot API client."""
+
+    def __init__(self, token: str, *, timeout_seconds: float = 35.0) -> None:
+        self._base_url = f"https://api.telegram.org/bot{token}"
+        self._timeout_seconds = timeout_seconds
+
+    def get_updates(self, *, offset: int | None = None, timeout: int = 30) -> list[dict[str, Any]]:
+        params: dict[str, Any] = {"timeout": timeout, "allowed_updates": json.dumps(["message"])}
+        if offset is not None:
+            params["offset"] = offset
+        data = self._post("getUpdates", params)
+        return list(data.get("result", []))
+
+    def send_message(self, chat_id: int, text: str, *, parse_mode: str | None = None) -> None:
+        params: dict[str, Any] = {"chat_id": chat_id, "text": text}
+        if parse_mode:
+            params["parse_mode"] = parse_mode
+        self._post("sendMessage", params)
+
+    def _post(self, method: str, params: dict[str, Any]) -> dict[str, Any]:
+        encoded = parse.urlencode(params).encode("utf-8")
+        api_request = request.Request(f"{self._base_url}/{method}", data=encoded, method="POST")
+        try:
+            with request.urlopen(api_request, timeout=self._timeout_seconds) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+        except (HTTPError, URLError, TimeoutError, OSError) as exc:
+            raise TelegramApiError(f"Telegram API request failed for {method}: {exc}") from exc
+        if not payload.get("ok"):
+            raise TelegramApiError(f"Telegram API request failed for {method}: {payload!r}")
+        return payload
 
 
 def is_authorized(config: BridgeConfig, user_id: int | None) -> bool:
@@ -58,74 +89,54 @@ def format_result(result: CommandResult, config: BridgeConfig) -> str:
     return escape(redact(_truncate(text), config.sensitive_env_names))
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await _reply_if_authorized(update, context, USAGE)
+def handle_message(message: dict[str, Any], config: BridgeConfig, controller: CodexController) -> list[tuple[str, str | None]]:
+    """Handle one Telegram message and return replies as ``(text, parse_mode)`` tuples."""
+
+    user_id = _extract_user_id(message)
+    if not is_authorized(config, user_id):
+        return [("Unauthorized.", None)]
+
+    text = str(message.get("text") or "").strip()
+    command, argument = _split_command(text)
+    if command == "/start":
+        return [(USAGE, None)]
+    if command == "/status":
+        return [("Bridge is alive.", None)]
+    if command == "/ask":
+        return _run_codex(argument, config, controller, prefix="Answer this without changing files: ", confirmed=True)
+    if command == "/run":
+        return _run_codex(argument, config, controller, prefix="", confirmed=False)
+    if command == "/run_confirm":
+        return _run_codex(argument, config, controller, prefix="", confirmed=True)
+    return [("Unknown command. Send /start for usage.", None)]
 
 
-async def status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await _reply_if_authorized(update, context, "Bridge is alive.")
+def run_polling(
+    config: BridgeConfig,
+    controller: CodexController | None = None,
+    client: TelegramClient | None = None,
+    *,
+    poll_timeout_seconds: int = 30,
+) -> None:
+    """Poll Telegram for messages and dispatch commands forever."""
 
-
-async def ask(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await _run_codex(update, context, prefix="Answer this without changing files: ", confirmed=True)
-
-
-async def run(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await _run_codex(update, context, prefix="", confirmed=False)
-
-
-async def run_confirm(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await _run_codex(update, context, prefix="", confirmed=True)
-
-
-async def reject_unknown(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await _reply_if_authorized(update, context, "Unknown command. Send /start for usage.")
-
-
-async def _run_codex(update: Update, context: ContextTypes.DEFAULT_TYPE, *, prefix: str, confirmed: bool) -> None:
-    config: BridgeConfig = context.application.bot_data["config"]
-    controller: CodexController = context.application.bot_data["controller"]
-    if not await _ensure_authorized(update, config):
-        return
-    instruction = " ".join(context.args or [])
-    error = validate_prompt(config, instruction)
-    if error:
-        await update.effective_message.reply_text(error)
-        return
-    await update.effective_message.reply_text("Codex task started...")
-    result = await asyncio.to_thread(controller.run, prefix + instruction, confirmed=confirmed)
-    await update.effective_message.reply_html(format_result(result, config))
-
-
-async def _reply_if_authorized(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str) -> None:
-    config: BridgeConfig = context.application.bot_data["config"]
-    if await _ensure_authorized(update, config):
-        await update.effective_message.reply_text(text)
-
-
-async def _ensure_authorized(update: Update, config: BridgeConfig) -> bool:
-    if is_authorized(config, update.effective_user.id if update.effective_user else None):
-        return True
-    if update.effective_message:
-        await update.effective_message.reply_text("Unauthorized.")
-    return False
-
-
-def build_application(config: BridgeConfig, controller: CodexController | None = None) -> Application:
-    """Build the python-telegram-bot application."""
-
-    from telegram.ext import Application as TelegramApplication, CommandHandler, MessageHandler, filters
-
-    app = TelegramApplication.builder().token(config.telegram_bot_token).build()
-    app.bot_data["config"] = config
-    app.bot_data["controller"] = controller or CodexController(config)
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("status", status))
-    app.add_handler(CommandHandler("ask", ask))
-    app.add_handler(CommandHandler("run", run))
-    app.add_handler(CommandHandler("run_confirm", run_confirm))
-    app.add_handler(MessageHandler(filters.ALL, reject_unknown))
-    return app
+    active_controller = controller or CodexController(config)
+    active_client = client or TelegramClient(config.telegram_bot_token)
+    offset: int | None = None
+    while True:
+        try:
+            updates = active_client.get_updates(offset=offset, timeout=poll_timeout_seconds)
+            for update in updates:
+                offset = int(update["update_id"]) + 1
+                message = update.get("message")
+                if not isinstance(message, dict) or "chat" not in message:
+                    continue
+                chat_id = int(message["chat"]["id"])
+                for reply, parse_mode in handle_message(message, config, active_controller):
+                    active_client.send_message(chat_id, reply, parse_mode=parse_mode)
+        except TelegramApiError as exc:
+            print(exc, flush=True)
+            time.sleep(5)
 
 
 def main() -> None:
@@ -135,9 +146,38 @@ def main() -> None:
         config = load_config()
     except ConfigError as exc:
         raise SystemExit(f"Configuration error: {exc}") from exc
-    from telegram import Update as TelegramUpdate
+    run_polling(config)
 
-    build_application(config).run_polling(allowed_updates=TelegramUpdate.ALL_TYPES)
+
+def _run_codex(
+    instruction: str,
+    config: BridgeConfig,
+    controller: CodexController,
+    *,
+    prefix: str,
+    confirmed: bool,
+) -> list[tuple[str, str | None]]:
+    error = validate_prompt(config, instruction)
+    if error:
+        return [(error, None)]
+    result = controller.run(prefix + instruction, confirmed=confirmed)
+    return [("Codex task started...", None), (format_result(result, config), "HTML")]
+
+
+def _split_command(text: str) -> tuple[str, str]:
+    if not text:
+        return "", ""
+    command, separator, argument = text.partition(" ")
+    command = command.split("@", 1)[0]
+    return command, argument if separator else ""
+
+
+def _extract_user_id(message: dict[str, Any]) -> int | None:
+    sender = message.get("from")
+    if not isinstance(sender, dict):
+        return None
+    user_id = sender.get("id")
+    return int(user_id) if isinstance(user_id, int) else None
 
 
 def _truncate(text: str, limit: int = 3500) -> str:
