@@ -102,3 +102,30 @@ Install test dependencies and run tests:
 pip install -e '.[test]'
 pytest -q
 ```
+
+## GitHub Codespaces setup
+
+This repository includes a `.devcontainer/devcontainer.json` so GitHub Codespaces can open it with Python and the test dependencies installed automatically.
+
+1. Push this repository to GitHub.
+2. In GitHub, select **Code** → **Codespaces** → **Create codespace on current branch**.
+3. Add repository or Codespace secrets for:
+   - `TELEGRAM_BOT_TOKEN`
+   - `TELEGRAM_ALLOWED_USER_IDS`
+4. In the Codespace terminal, export the secrets into the shell if they are not already present:
+
+   ```bash
+   export TELEGRAM_BOT_TOKEN="$TELEGRAM_BOT_TOKEN"
+   export TELEGRAM_ALLOWED_USER_IDS="$TELEGRAM_ALLOWED_USER_IDS"
+   export CODEX_WORKDIR="$PWD"
+   ```
+
+5. Start the bridge:
+
+   ```bash
+   codex-telegram-bridge
+   ```
+
+Codespaces are useful for testing, but they may stop when idle. For a long-running production bridge, prefer a small VPS, container worker, or systemd service on a server you control.
+
+You can also copy `.env.example` to `.env` for local setup, but do not commit real tokens.
