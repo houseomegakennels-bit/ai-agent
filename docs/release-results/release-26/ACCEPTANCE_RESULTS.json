@@ -1,0 +1,14 @@
+{
+  "release": "26",
+  "status": "passed",
+  "checks": [
+    "npm run test:telegram-bridge-dry-run",
+    "npm test",
+    "npm run build",
+    "./scripts/validate-environment.sh",
+    "./scripts/validate-no-secrets.sh"
+  ],
+  "runtime_services_implemented": false,
+  "production_deploy_enabled": false,
+  "telegram_runtime_status": "dry_run_only"
+}

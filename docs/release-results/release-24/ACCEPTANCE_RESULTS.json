@@ -1,0 +1,13 @@
+{
+  "release": "24",
+  "status": "passed",
+  "checks": [
+    "npm run test:go-live-readiness",
+    "npm test",
+    "./scripts/validate-environment.sh",
+    "./scripts/validate-no-secrets.sh"
+  ],
+  "runtime_services_implemented": false,
+  "production_deploy_enabled": false,
+  "go_live_status": "blocked_by_operator_gates"
+}

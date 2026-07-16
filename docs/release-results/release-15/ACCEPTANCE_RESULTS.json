@@ -1,0 +1,11 @@
+{
+  "release": "15",
+  "status": "passed",
+  "checks": [
+    { "name": "local_task_grouping_tests", "command": "npm run test:local-task-grouping", "status": "passed" },
+    { "name": "full_test_suite", "command": "npm test", "status": "passed" },
+    { "name": "command_interface_build", "command": "npm run build", "status": "passed" },
+    { "name": "environment_validation", "command": "./scripts/validate-environment.sh", "status": "passed" },
+    { "name": "secret_scan", "command": "./scripts/validate-no-secrets.sh", "status": "passed" }
+  ]
+}

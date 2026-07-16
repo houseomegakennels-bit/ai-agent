@@ -1,0 +1,14 @@
+{
+  "release": "27",
+  "status": "passed",
+  "checks": [
+    "npm run test:deployment-preview",
+    "npm test",
+    "npm run build",
+    "./scripts/validate-environment.sh",
+    "./scripts/validate-no-secrets.sh"
+  ],
+  "runtime_services_implemented": false,
+  "production_deploy_enabled": false,
+  "deployment_preview_status": "redacted_local_smoke_only"
+}

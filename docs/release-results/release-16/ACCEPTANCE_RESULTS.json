@@ -1,0 +1,11 @@
+{
+  "release": "16",
+  "status": "passed",
+  "checks": [
+    "npm run test:local-task-detail",
+    "npm test",
+    "npm run build",
+    "./scripts/validate-environment.sh",
+    "./scripts/validate-no-secrets.sh"
+  ]
+}

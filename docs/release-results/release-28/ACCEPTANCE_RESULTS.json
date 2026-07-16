@@ -1,0 +1,14 @@
+{
+  "release": "28",
+  "status": "passed",
+  "checks": [
+    "npm run test:production-go-live-candidate",
+    "npm test",
+    "npm run build",
+    "./scripts/validate-environment.sh",
+    "./scripts/validate-no-secrets.sh"
+  ],
+  "runtime_services_implemented": false,
+  "production_deploy_enabled": false,
+  "go_live_candidate_status": "blocked_not_live"
+}

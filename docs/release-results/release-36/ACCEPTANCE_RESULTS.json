@@ -1,0 +1,17 @@
+{
+  "release": "36",
+  "status": "completed_pending_operator_review",
+  "checks": {
+    "telegram_production_cutover_dry_run_contract": "passed",
+    "redacted_cutover_artifacts": "passed",
+    "no_production_bot_connected": "passed",
+    "no_bot_token": "passed",
+    "no_webhook_secret": "passed",
+    "no_chat_id": "passed",
+    "no_live_endpoint": "passed",
+    "no_server_ip": "passed",
+    "no_real_secret": "passed",
+    "no_paid_api": "passed",
+    "no_broker_or_trading_integration": "passed"
+  }
+}

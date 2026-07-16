@@ -1,0 +1,18 @@
+{
+  "release": "35",
+  "status": "completed_pending_operator_review",
+  "checks": {
+    "rollback_restore_dry_run_evidence_contract": "passed",
+    "release_34_preview_references": "passed",
+    "no_infrastructure_commands_executed": "passed",
+    "no_runtime_services_implemented": "passed",
+    "no_deployment_automation_created": "passed",
+    "no_runtime_deployment": "passed",
+    "no_live_endpoint": "passed",
+    "no_server_ip": "passed",
+    "no_real_secret": "passed",
+    "no_telegram_production_bot": "passed",
+    "no_paid_api": "passed",
+    "no_broker_or_trading_integration": "passed"
+  }
+}

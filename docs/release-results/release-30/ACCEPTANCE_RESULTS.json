@@ -1,0 +1,14 @@
+{
+  "release": "30",
+  "status": "completed_pending_operator_review",
+  "checks": [
+    { "command": "npm run test:operator-launch-decision-record", "status": "passed" },
+    { "command": "npm test", "status": "passed" },
+    { "command": "npm run build", "status": "passed" },
+    { "command": "./scripts/validate-environment.sh", "status": "passed" },
+    { "command": "./scripts/validate-no-secrets.sh", "status": "passed" }
+  ],
+  "runtime_services_started": false,
+  "production_deployed": false,
+  "operator_launch_decision_status": "redacted_go_no_go_contract_only"
+}
