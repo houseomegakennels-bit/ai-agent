@@ -1,0 +1,14 @@
+{
+  "release": "29",
+  "status": "completed_pending_operator_review",
+  "checks": [
+    { "command": "npm run test:final-preflight-evidence-bundle", "status": "passed" },
+    { "command": "npm test", "status": "passed" },
+    { "command": "npm run build", "status": "passed" },
+    { "command": "./scripts/validate-environment.sh", "status": "passed" },
+    { "command": "./scripts/validate-no-secrets.sh", "status": "passed" }
+  ],
+  "runtime_services_started": false,
+  "production_deployed": false,
+  "final_preflight_status": "redacted_operator_review_only"
+}

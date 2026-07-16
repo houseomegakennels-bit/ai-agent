@@ -1,0 +1,10 @@
+{
+  "name": "Helix Command",
+  "short_name": "Helix",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#0ea5e9",
+  "description": "Phone-first Blackspire Helix command interface scaffold.",
+  "icons": []
+}

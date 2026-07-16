@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "states": {
+    "primary": "#38bdf8",
+    "accent": "#22d3ee",
+    "background": "#07111f",
+    "surface": "#0f172a",
+    "text_primary": "#f8fafc",
+    "text_secondary": "#bfd1e5",
+    "success": "#22c55e",
+    "warning": "#f59e0b",
+    "critical": "#ef4444",
+    "information": "#0ea5e9",
+    "inactive": "#64748b",
+    "focus": "#facc15"
+  },
+  "rules": [
+    "Color is never the only status indicator.",
+    "Controls target a minimum 48px touch height.",
+    "Reduced Motion must disable nonessential animation.",
+    "Low-bandwidth mode must disable nonessential visual effects."
+  ]
+}

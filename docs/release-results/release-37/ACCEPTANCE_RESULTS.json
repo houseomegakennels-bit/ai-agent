@@ -1,0 +1,17 @@
+{
+  "release": "37",
+  "status": "completed_pending_operator_review",
+  "accepted_scope": "Production health/readiness smoke-test contract only",
+  "checks": [
+    "Redacted health response shape fixture defined",
+    "Redacted readiness response shape fixture defined",
+    "Telegram webhook health placeholder defined without production bot connection",
+    "Operator mobile smoke proof placeholder defined for future iPhone validation",
+    "Rollback health gate placeholder defined without executing infrastructure commands",
+    "No live endpoint, production URL, server IP, secret, paid API, broker, or trading integration added"
+  ],
+  "runtime_services_implemented": false,
+  "live_endpoints_contacted": false,
+  "secrets_included": false,
+  "operator_approval_required_before_next_release": true
+}

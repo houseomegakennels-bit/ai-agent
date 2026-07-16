@@ -1,0 +1,14 @@
+{
+  "release": "25",
+  "status": "passed",
+  "checks": [
+    "npm run test:controller-runtime-hardening",
+    "npm test",
+    "npm run build",
+    "./scripts/validate-environment.sh",
+    "./scripts/validate-no-secrets.sh"
+  ],
+  "runtime_services_implemented": false,
+  "production_deploy_enabled": false,
+  "controller_runtime_status": "dry_run_only"
+}

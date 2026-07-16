@@ -1,0 +1,14 @@
+{
+  "release": "31",
+  "status": "completed_pending_operator_review",
+  "checks": [
+    { "command": "npm run test:runtime-cutover-runbook-template", "status": "passed" },
+    { "command": "npm test", "status": "passed" },
+    { "command": "npm run build", "status": "passed" },
+    { "command": "./scripts/validate-environment.sh", "status": "passed" },
+    { "command": "./scripts/validate-no-secrets.sh", "status": "passed" }
+  ],
+  "runtime_services_started": false,
+  "production_deployed": false,
+  "runtime_cutover_runbook_status": "redacted_template_contract_only"
+}

@@ -1,0 +1,13 @@
+{
+  "release": "20",
+  "status": "completed_pending_operator_review",
+  "accepted_scope": [
+    "local task notes contract",
+    "in-memory mock annotation adapter",
+    "command-interface task notes preview section",
+    "grouped loading empty validation not-found and error states",
+    "release 20 tests and handoff package"
+  ],
+  "forbidden_items_present": false,
+  "requires_operator_review": true
+}

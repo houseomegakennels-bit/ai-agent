@@ -1,0 +1,14 @@
+{
+  "release": "21",
+  "status": "completed_pending_operator_review",
+  "accepted_scope": [
+    "local task activity feed contract",
+    "in-memory mock recent-change adapter",
+    "command-interface activity feed preview section",
+    "grouped loading empty validation and error states",
+    "release 21 tests and handoff package"
+  ],
+  "telegram_bridge_set_up": false,
+  "forbidden_items_present": false,
+  "requires_operator_review": true
+}

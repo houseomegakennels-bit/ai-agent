@@ -1,0 +1,11 @@
+{
+  "release": "17",
+  "status": "passed",
+  "checks": [
+    "npm run test:local-task-search-sort",
+    "npm test",
+    "npm run build",
+    "./scripts/validate-environment.sh",
+    "./scripts/validate-no-secrets.sh"
+  ]
+}

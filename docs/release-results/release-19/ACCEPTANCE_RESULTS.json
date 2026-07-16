@@ -1,0 +1,13 @@
+{
+  "release": "19",
+  "status": "completed_pending_operator_review",
+  "accepted_scope": [
+    "local task timeline contract",
+    "in-memory daily focus adapter",
+    "command-interface timeline and daily focus sections",
+    "grouped loading empty validation and error states",
+    "release 19 tests and handoff package"
+  ],
+  "forbidden_items_present": false,
+  "requires_operator_review": true
+}

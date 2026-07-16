@@ -1,0 +1,18 @@
+{
+  "release": "38",
+  "status": "completed_pending_operator_review",
+  "accepted_scope": "Operator production incident response drill contract only",
+  "checks": [
+    "Operator incident intake proof placeholder defined for iPhone review",
+    "Operator escalation path proof placeholder defined without live contacts",
+    "Service degradation triage proof placeholder defined without live endpoint contact",
+    "Emergency Stop confirmation proof placeholder defined without execution",
+    "Post-incident handoff proof placeholder defined for iPhone review",
+    "No live endpoint, production URL, server IP, secret, paid API, broker, trading integration, or runtime incident action added"
+  ],
+  "runtime_services_implemented": false,
+  "live_endpoints_contacted": false,
+  "runtime_actions_executed": false,
+  "secrets_included": false,
+  "operator_approval_required_before_next_release": true
+}
