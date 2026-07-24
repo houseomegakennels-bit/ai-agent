@@ -1,0 +1,23 @@
+{
+  "name": "Codex Telegram Bridge",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "postCreateCommand": "python -m pip install --upgrade pip && python -m pip install -e '.[test]'",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python",
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": [
+          "tests"
+        ]
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance"
+      ]
+    }
+  },
+  "remoteEnv": {
+    "CODEX_WORKDIR": "${containerWorkspaceFolder}"
+  }
+}
