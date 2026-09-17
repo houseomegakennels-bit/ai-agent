@@ -14,6 +14,10 @@ An importable n8n workflow that normalizes RFQ line items, restricts prices to a
 
 A Python and Playwright sample that extracts records from a synthetic portal fixture, validates the data, submits approved records to a local mock CRM endpoint, and prevents duplicates across repeated runs.
 
+### [AI Voice Receptionist Safety Demonstration](portfolio/voice-receptionist-demo/)
+
+An importable n8n workflow and standalone acceptance runner that normalize mock voice-provider payloads, protect appointment confirmation behind a successful write, block duplicates, and route emergencies or uncertain cases to people.
+
 ## Delivery approach
 
 Scope first, implement in isolation, run automated checks, review the result, perform bounded repairs, and provide a documented handoff. Purchases, credentials, production deployment, financial actions, and live customer communication remain behind explicit human approval.

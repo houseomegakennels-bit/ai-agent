@@ -1,0 +1,24 @@
+Blackspire AI Voice Receptionist Safety Demonstration
+Test run: 2026-09-17 UTC
+Runtime: Node.js standalone acceptance runner
+
+PASS: successful write permits confirmation
+PASS: successful write returns mock calendar record
+PASS: repeat request is blocked
+PASS: calendar failure never confirms
+PASS: calendar failure goes to human review
+PASS: missing booking details are requested
+PASS: human request transfers without action
+PASS: emergency language escalates
+PASS: general question becomes a message
+PASS: invalid payload requires review
+PASS: Twilio-style fields normalize correctly
+PASS: demo never claims a live provider call
+PASS: workflow export parses and is explicitly labeled
+
+13/13 acceptance tests passed.
+
+Important limitation:
+The standalone runner verifies the deterministic decision logic mirrored by the
+n8n Code node. The workflow export parses successfully but has not been
+represented as a live Twilio, ElevenLabs, calendar, or customer deployment.

@@ -1,0 +1,53 @@
+{
+  "name": "Blackspire AI Voice Receptionist Safety Demonstration",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-660, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json:{provider:'twilio-mock',CallSid:'CA-DEMO-001',From:'+15550101010',SpeechResult:'I need to book an appointment',caller_name:'Jordan Example',requested_start:'2026-09-22T14:30:00-04:00',simulate_calendar_failure:false}}];"
+      },
+      "id": "synthetic-call",
+      "name": "Synthetic Voice Call",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-420, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$input.first().json;const c=v=>String(v??'').trim();const call={provider:c(b.provider||(b.CallSid?'twilio-mock':'elevenlabs-mock')),callId:c(b.call_id||b.CallSid||b.conversation_id),caller:c(b.caller||b.From||b.phone_number),transcript:c(b.transcript||b.SpeechResult||b.user_transcript),intent:c(b.intent).toLowerCase(),callerName:c(b.caller_name||b.name),requestedStart:c(b.requested_start||b.appointment_start),simulateCalendarFailure:b.simulate_calendar_failure===true};const words=call.transcript.toLowerCase(),base={demonstration:true,liveProviderCalled:false,call};let out;if(!call.callId||!call.caller||!call.transcript)out={...base,status:'human_review',reason:'INVALID_OR_INCOMPLETE_CALL_PAYLOAD',confirmationAllowed:false};else if(/\\b(emergency|can.t breathe|cannot breathe|chest pain|suicide|kill myself|fire)\\b/i.test(words))out={...base,status:'emergency_escalation',reason:'EMERGENCY_LANGUAGE_DETECTED',confirmationAllowed:false};else if(call.intent==='human'||/\\b(human|representative|real person|operator)\\b/i.test(words))out={...base,status:'human_transfer',reason:'CALLER_REQUESTED_HUMAN',confirmationAllowed:false};else if(!(call.intent==='book_appointment'||/\\b(book|schedule|appointment)\\b/i.test(words)))out={...base,status:'message_captured',reason:'NO_BOOKING_ACTION_REQUESTED',confirmationAllowed:false};else{const missing=[];if(!call.callerName)missing.push('caller_name');if(!call.requestedStart)missing.push('requested_start');if(missing.length)out={...base,status:'needs_information',reason:'MISSING_BOOKING_FIELDS',missing,confirmationAllowed:false};else{const slug=v=>c(v).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''),key=`booking:${slug(call.caller)}:${slug(call.requestedStart)}`,state=$getWorkflowStaticData('global');state.keys=Array.isArray(state.keys)?state.keys:[];if(state.keys.includes(key))out={...base,status:'duplicate_blocked',reason:'IDEMPOTENCY_KEY_ALREADY_SEEN',idempotencyKey:key,confirmationAllowed:false};else if(call.simulateCalendarFailure)out={...base,status:'human_review',reason:'CALENDAR_WRITE_FAILED',idempotencyKey:key,confirmationAllowed:false};else{const record={id:`demo-${slug(call.callId)}`,start:call.requestedStart,callerName:call.callerName,caller:call.caller};state.keys.push(key);out={...base,status:'booked',reason:'MOCK_CALENDAR_RECORD_CREATED',idempotencyKey:key,confirmationAllowed:true,calendarRecord:record};}}}return [{json:out}];"
+      },
+      "id": "safe-decision",
+      "name": "Validate Route and Mock Write",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-160, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const d=$input.first().json;const response=d.status==='booked'?`Your demonstration appointment is confirmed for ${d.calendarRecord.start}.`:d.status==='emergency_escalation'?'If this is an emergency, call local emergency services now.':d.status==='human_transfer'?'I will route this request to a person.':d.status==='duplicate_blocked'?'This request is already being handled.':d.status==='needs_information'?`I still need: ${d.missing.join(', ')}.`:d.status==='message_captured'?'I can take a message or help collect appointment details.':'I could not confirm that appointment. A person will review the request.';return [{json:{...d,response,audit:{evaluatedAt:new Date().toISOString(),demoOnly:true,externalWrites:0}}}];"
+      },
+      "id": "safe-response",
+      "name": "Build Safe Response and Audit Record",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [100, 0]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {"main":[[{"node":"Synthetic Voice Call","type":"main","index":0}]]},
+    "Synthetic Voice Call": {"main":[[{"node":"Validate Route and Mock Write","type":"main","index":0}]]},
+    "Validate Route and Mock Write": {"main":[[{"node":"Build Safe Response and Audit Record","type":"main","index":0}]]}
+  },
+  "active": false,
+  "settings": {"executionOrder":"v1"},
+  "versionId": "blackspire-voice-demo-2026-09-17",
+  "meta": {"templateCredsSetupCompleted": true, "demonstrationProject": true, "liveProviderConnected": false},
+  "tags": []
+}
