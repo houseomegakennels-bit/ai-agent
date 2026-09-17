@@ -1,0 +1,64 @@
+{
+  "name": "RFQ-to-Quote Synthetic Demonstration",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-720, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json:{demonstration:true,customerData:false,priceListVersion:'synthetic-v1-2026-09-17',catalogue:[{code:'CBL-100',description:'Copper cable 100m roll',unit:'ROLL',price:142.5},{code:'MCB-20A',description:'Miniature circuit breaker 20A',unit:'EA',price:18.75},{code:'JBOX-4',description:'Junction box 4 way',unit:'EA',price:6.4}],rfqRows:[{line:1,code:'CBL-100',description:'Copper cable 100m roll',quantity:2,unit:'roll'},{line:2,code:'mcb-20a',description:'MCB 20 amp',quantity:5,unit:'EA'},{line:3,code:'',description:'Junction box four way',quantity:3,unit:'EA'},{line:4,code:'UNKNOWN-9',description:'Unknown component',quantity:1,unit:'EA'},{line:5,code:'CBL-100',description:'Copper cable 100m roll',quantity:0,unit:'ROLL'},{line:6,code:'MCB-20A',description:'MCB 20 amp',quantity:5,unit:'EA'},{line:7,code:'MCB-20A',description:'MCB 20 amp',quantity:7,unit:'EA'},{line:8,code:'JBOX-4',description:'Junction box 4 way',quantity:2,unit:''}]}}];"
+      },
+      "id": "synthetic-fixture",
+      "name": "Synthetic RFQ Fixture",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-480, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const d=$input.first().json; const norm=v=>String(v??'').trim().toUpperCase().replace(/[^A-Z0-9]+/g,' '); const sim=(a,b)=>{const x=new Set(norm(a).split(' ').filter(Boolean)),y=new Set(norm(b).split(' ').filter(Boolean)); if(!x.size||!y.size)return 0; const i=[...x].filter(t=>y.has(t)).length; return i/new Set([...x,...y]).size}; const exact=new Map(d.catalogue.map(p=>[norm(p.code).replace(/ /g,'-'),p])); const seen=new Map(),quoteRows=[],reviewRows=[]; for(const r of d.rfqRows){const code=norm(r.code).replace(/ /g,'-'),unit=norm(r.unit).replace(/ /g,''),qty=Number(r.quantity),fp=`${code}|${norm(r.description)}|${unit}`; if(!Number.isFinite(qty)||qty<=0){reviewRows.push({...r,status:'REVIEW',reason:'INVALID_QUANTITY'});continue} if(!unit){reviewRows.push({...r,status:'REVIEW',reason:'MISSING_UNIT'});continue} if(seen.has(fp)){reviewRows.push({...r,status:'REVIEW',reason:seen.get(fp)===qty?'EXACT_DUPLICATE':'CONFLICTING_DUPLICATE'});continue} seen.set(fp,qty); const p=exact.get(code); if(p){if(norm(p.unit).replace(/ /g,'')!==unit){reviewRows.push({...r,status:'REVIEW',reason:'UNIT_MISMATCH',candidateCode:p.code});continue} quoteRows.push({line:r.line,requestedCode:r.code,matchedCode:p.code,description:p.description,quantity:qty,unit:p.unit,unitPrice:p.price,lineTotal:Number((qty*p.price).toFixed(2)),matchMethod:'EXACT_CODE',priceListVersion:d.priceListVersion,status:'READY'});continue} const best=d.catalogue.map(p=>({p,score:sim(r.description,p.description)})).sort((a,b)=>b.score-a.score)[0]; if(best&&best.score>=.5)reviewRows.push({...r,status:'REVIEW',reason:'DESCRIPTION_CANDIDATE_REQUIRES_APPROVAL',candidateCode:best.p.code,confidence:Number(best.score.toFixed(2))}); else reviewRows.push({...r,status:'REVIEW',reason:'NO_APPROVED_MATCH'}); } return [{json:{metadata:{demonstration:d.demonstration,customerData:d.customerData,priceListVersion:d.priceListVersion},quoteRows,reviewRows}}];"
+      },
+      "id": "validate-match-price",
+      "name": "Validate Match and Price",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-240, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const d=$input.first().json; return [{json:{...d,summary:{inputRows:d.quoteRows.length+d.reviewRows.length,readyRows:d.quoteRows.length,reviewRows:d.reviewRows.length,quoteTotal:Number(d.quoteRows.reduce((s,r)=>s+r.lineTotal,0).toFixed(2))}}}];"
+      },
+      "id": "build-draft",
+      "name": "Build Quote Draft",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const d=$input.first().json; const checks=[['accounted',d.summary.readyRows+d.summary.reviewRows===8],['ready rows',d.summary.readyRows===2],['quote total',d.summary.quoteTotal===378.75],['human review present',d.reviewRows.length===6],['versioned prices',d.quoteRows.every(r=>r.priceListVersion==='synthetic-v1-2026-09-17')],['demo labeled',d.metadata.demonstration===true]]; return [{json:{...d,acceptanceChecks:checks.map(([name,passed])=>({name,passed})),allChecksPassed:checks.every(([,passed])=>passed)}}];"
+      },
+      "id": "acceptance-summary",
+      "name": "Acceptance Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 0]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {"main":[[{"node":"Synthetic RFQ Fixture","type":"main","index":0}]]},
+    "Synthetic RFQ Fixture": {"main":[[{"node":"Validate Match and Price","type":"main","index":0}]]},
+    "Validate Match and Price": {"main":[[{"node":"Build Quote Draft","type":"main","index":0}]]},
+    "Build Quote Draft": {"main":[[{"node":"Acceptance Summary","type":"main","index":0}]]}
+  },
+  "active": false,
+  "settings": {"executionOrder":"v1"},
+  "versionId": "synthetic-rfq-demo-2026-09-17",
+  "meta": {"templateCredsSetupCompleted": true, "demonstrationProject": true},
+  "tags": []
+}

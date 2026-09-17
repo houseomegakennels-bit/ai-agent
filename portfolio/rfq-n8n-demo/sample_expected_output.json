@@ -1,0 +1,99 @@
+{
+  "metadata": {
+    "demonstration": true,
+    "customerData": false,
+    "priceListVersion": "synthetic-v1-2026-09-17"
+  },
+  "quoteRows": [
+    {
+      "line": 1,
+      "requestedCode": "CBL-100",
+      "matchedCode": "CBL-100",
+      "description": "Copper cable 100m roll",
+      "quantity": 2,
+      "unit": "ROLL",
+      "unitPrice": 142.5,
+      "lineTotal": 285,
+      "matchMethod": "EXACT_CODE",
+      "priceListVersion": "synthetic-v1-2026-09-17",
+      "status": "READY"
+    },
+    {
+      "line": 2,
+      "requestedCode": "mcb-20a",
+      "matchedCode": "MCB-20A",
+      "description": "Miniature circuit breaker 20A",
+      "quantity": 5,
+      "unit": "EA",
+      "unitPrice": 18.75,
+      "lineTotal": 93.75,
+      "matchMethod": "EXACT_CODE",
+      "priceListVersion": "synthetic-v1-2026-09-17",
+      "status": "READY"
+    }
+  ],
+  "reviewRows": [
+    {
+      "line": 3,
+      "code": "",
+      "description": "Junction box four way",
+      "quantity": 3,
+      "unit": "EA",
+      "status": "REVIEW",
+      "reason": "DESCRIPTION_CANDIDATE_REQUIRES_APPROVAL",
+      "candidateCode": "JBOX-4",
+      "confidence": 0.6
+    },
+    {
+      "line": 4,
+      "code": "UNKNOWN-9",
+      "description": "Unknown component",
+      "quantity": 1,
+      "unit": "EA",
+      "status": "REVIEW",
+      "reason": "NO_APPROVED_MATCH"
+    },
+    {
+      "line": 5,
+      "code": "CBL-100",
+      "description": "Copper cable 100m roll",
+      "quantity": 0,
+      "unit": "ROLL",
+      "status": "REVIEW",
+      "reason": "INVALID_QUANTITY"
+    },
+    {
+      "line": 6,
+      "code": "MCB-20A",
+      "description": "MCB 20 amp",
+      "quantity": 5,
+      "unit": "EA",
+      "status": "REVIEW",
+      "reason": "EXACT_DUPLICATE"
+    },
+    {
+      "line": 7,
+      "code": "MCB-20A",
+      "description": "MCB 20 amp",
+      "quantity": 7,
+      "unit": "EA",
+      "status": "REVIEW",
+      "reason": "CONFLICTING_DUPLICATE"
+    },
+    {
+      "line": 8,
+      "code": "JBOX-4",
+      "description": "Junction box 4 way",
+      "quantity": 2,
+      "unit": "",
+      "status": "REVIEW",
+      "reason": "MISSING_UNIT"
+    }
+  ],
+  "summary": {
+    "inputRows": 8,
+    "readyRows": 2,
+    "reviewRows": 6,
+    "quoteTotal": 378.75
+  }
+}

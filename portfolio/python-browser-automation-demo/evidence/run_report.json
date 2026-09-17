@@ -1,0 +1,53 @@
+{
+  "kind": "new_application_sample",
+  "live_ghl_tested": false,
+  "checks": {
+    "first_run_created_two": true,
+    "second_run_updated_two": true,
+    "first_run_rejected_bad_email": true,
+    "second_run_rejected_bad_email": true,
+    "no_duplicate_contacts": true,
+    "stable_ids_preserved": true,
+    "invalid_row_never_written": true,
+    "email_mapping_correct": true
+  },
+  "passed": 8,
+  "total": 8,
+  "first_run": {
+    "synced": [
+      {
+        "source_id": "demo-001",
+        "action": "created"
+      },
+      {
+        "source_id": "demo-002",
+        "action": "created"
+      }
+    ],
+    "rejected": [
+      {
+        "source_id": "demo-003",
+        "reason": "Invalid demo email"
+      }
+    ]
+  },
+  "second_run": {
+    "synced": [
+      {
+        "source_id": "demo-001",
+        "action": "updated"
+      },
+      {
+        "source_id": "demo-002",
+        "action": "updated"
+      }
+    ],
+    "rejected": [
+      {
+        "source_id": "demo-003",
+        "reason": "Invalid demo email"
+      }
+    ]
+  },
+  "unique_contacts": 2
+}

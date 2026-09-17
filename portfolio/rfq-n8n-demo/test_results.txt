@@ -1,0 +1,28 @@
+RFQ-to-Quote Synthetic Demonstration
+Test run: 2026-09-17 UTC
+Runtime: Node.js standalone acceptance runner
+
+PASS: all input rows are accounted for
+PASS: exact approved codes are priced
+PASS: prices come from the approved list
+PASS: quote arithmetic is correct
+PASS: description-only match requires approval
+PASS: unknown code is held for review
+PASS: invalid quantity is rejected
+PASS: exact duplicate is detected
+PASS: conflicting duplicate is detected
+PASS: missing unit is held for review
+PASS: every priced row records price-list version
+PASS: demonstration is explicitly labeled
+
+12/12 acceptance tests passed.
+
+Workflow export validation:
+- JSON parsed successfully.
+- Five nodes present.
+- Uses only built-in Manual Trigger and Code nodes.
+
+Important limitation:
+The acceptance runner verifies the workflow's deterministic matching, pricing,
+review-routing, duplication, and arithmetic rules outside n8n. The export has
+not been represented as a production deployment or paid client implementation.
