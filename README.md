@@ -2,9 +2,19 @@
 
 Verified demonstration work prepared by Carlos Pearson / Blackspire Helix Group.
 
-These projects show Blackspire's approach to scoped automation, validation, testing, human review, and documented handoff. They are demonstration projects built with synthetic data. They are **not** represented as paid client deployments or live production integrations.
+Blackspire builds automation and AI-enabled operating systems with a simple standard: **systems should be built to be checked**. The projects below use synthetic or disposable test data, automated evidence, explicit limitations, and human approval boundaries.
 
-## Demonstrations
+They are demonstration projects. They are **not** represented as paid client deployments or unsupported production integrations.
+
+## Flagship case study
+
+### [Blackspire Command](portfolio/blackspire-command/)
+
+A test-backed AI operations control plane that coordinates task intake, policy checks, human approvals, worker execution, isolated Git changes, validation, cancellation, emergency-stop behavior, and auditable evidence.
+
+Verified milestones include a 114-test foundation acceptance run, a separate 139-test unified-input regression, and 11/11 manual iPhone checks. Live-production operation and live third-party transport are explicitly outside the portfolio claim.
+
+## Focused demonstrations
 
 ### [RFQ-to-Quote n8n Demonstration](portfolio/rfq-n8n-demo/)
 
@@ -25,5 +35,5 @@ Scope first, implement in isolation, run automated checks, review the result, pe
 ## Contact
 
 Carlos Pearson  
-Blackspire Helix Group  
+Founder / Operator, Blackspire Helix Group  
 North Carolina, USA
